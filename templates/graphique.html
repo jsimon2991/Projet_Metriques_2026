@@ -61,10 +61,8 @@
     }
 
     function toDate(isoLike) {
-      const [datePart, timePart] = isoLike.split('T');
-      const [y, m, d] = datePart.split('-').map(Number);
-      const [hh, mm] = timePart.split(':').map(Number);
-      return new Date(y, m - 1, d, hh, mm, 0);
+      // Format: "2026-04-23T00:00"
+      return new Date(isoLike);
     }
 
     function drawChart(rows) {
