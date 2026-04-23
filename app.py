@@ -55,9 +55,10 @@ def api_marseille():
 
     return jsonify(result)
 
-    @app.route("/atelier")
+@app.route("/atelier")
 def atelier():
     return render_template("atelier.html")
+
 # Ne rien mettre après ce commentaire
 
 if __name__ == "__main__":
