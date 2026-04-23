@@ -3,17 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Températures Paris — Google LineChart</title>
-
+  <title>Températures Paris</title>
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    body { font-family: Arial, sans-serif; margin: 24px; }
     #chart { width: 100%; height: 520px; }
     #status { margin-top: 12px; color: #333; }
   </style>
 </head>
-
 <body>
   <h1>Températures horaires — Paris</h1>
   <div id="chart"></div>
@@ -21,43 +18,33 @@
 
   <script>
     google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(init);
+    google.charts.setOnLoadCallback(drawChart);
 
-    async function init() {
+    async function drawChart() {
       try {
         const res = await fetch('/paris');
         const json = await res.json();
+        
+        const rows = [['Heure', 'Température (°C)']];
+        for (let i = 0; i < Math.min(168, json.length); i++) {
+          rows.push([i, json[i].temperature_c]);
+        }
 
-        // Prendre les 168 premières heures (7 jours)
-        const rows = json.slice(0, 168).map((p, idx) => [
-          idx + ' h',
-          Number(p.temperature_c)
-        ]);
-
-        const data = google.visualization.arrayToDataTable([
-          ['Heure', 'Température (°C)'],
-          ...rows
-        ]);
+        const data = google.visualization.arrayToDataTable(rows);
 
         const options = {
           title: 'Température à Paris (7 jours)',
           curveType: 'function',
           legend: { position: 'bottom' },
-          hAxis: {
-            title: 'Heures'
-          },
-          vAxis: {
-            title: 'Température (°C)'
-          }
+          hAxis: { title: 'Heures' },
+          vAxis: { title: 'Température (°C)' }
         };
 
         const chart = new google.visualization.LineChart(document.getElementById('chart'));
         chart.draw(data, options);
-
-        document.getElementById('status').textContent = 'OK — ' + rows.length + ' points chargés';
+        document.getElementById('status').textContent = 'OK - ' + (json.length) + ' points chargés';
       } catch (err) {
         document.getElementById('status').textContent = 'Erreur: ' + err.message;
-        console.error(err);
       }
     }
   </script>
