@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Histogramme — Paris</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    #chartContainer { position: relative; width: 100%; height: 520px; }
+  </style>
+</head>
+<body>
+  <h1>Température à Paris — Histogramme (24h)</h1>
+  <div id="chartContainer">
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script>
+    async function drawChart() {
+      const res = await fetch('/paris');
+      const json = await res.json();
+      
+      const labels = [];
+      const temps = [];
+      
+      // Prendre les 24 premières heures
+      for (let i = 0; i < Math.min(24, json.length); i++) {
+        labels.push(i + 'h');
+        temps.push(json[i].temperature_c);
+      }
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Température (°C)',
+            data: temps,
+            backgroundColor: 'rgba(102, 126, 234, 0.7)',
+            borderColor: '#667eea',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Température horaire à Paris (24h)'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Température (°C)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Heure du jour'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    drawChart();
+  </script>
+</body>
+</html>
